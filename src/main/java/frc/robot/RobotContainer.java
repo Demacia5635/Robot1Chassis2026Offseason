@@ -26,6 +26,7 @@ import frc.robot.Path.Trajectory.ChangeReefToClosest;
 import frc.robot.Path.Trajectory.FollowTrajectory;
 import frc.robot.Path.Utils.PathPoint;
 import frc.robot.chassis.commands.Drive;
+import frc.robot.chassis.commands.GoToPose;
 import frc.robot.chassis.commands.auto.FieldTarget.ELEMENT_POSITION;
 import frc.robot.chassis.commands.auto.FieldTarget.FEEDER_SIDE;
 import frc.robot.chassis.commands.auto.FieldTarget.LEVEL;
@@ -58,6 +59,7 @@ import frc.robot.utils.LogManager;
 import frc.robot.utils.CommandController.ControllerType;
 import frc.robot.utils.Elastic.Notification;
 import frc.robot.utils.Elastic.Notification.NotificationLevel;
+import frc.robot.vision.Quest;
 
 
 /**
@@ -96,9 +98,11 @@ public class RobotContainer implements Sendable{
   public final Timer timer = new Timer();
 
   private Trigger userButtonTrigger;
+  public static Quest quest;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    quest = new Quest();
     // WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     robotContainer = this;
     new LogManager();
@@ -169,58 +173,8 @@ public class RobotContainer implements Sendable{
     // userButtonTrigger.onTrue(new RobotCoastOrBrake(chassis, arm));
 
     driverController.getLeftStickMove().onTrue(new Drive(chassis, driverController));
-    // driverController.getRightStickkMove().onTrue(new JoyClimeb(driverController, climb));
-    // driverController.leftStick().onTrue(new InstantCommand(() -> arm.setState(ARM_ANGLE_STATES.L1)));
-
-    driverController.rightButton().onTrue(new InstantCommand(()-> Drive.invertPrecisionMode()));
-    driverController.downButton().onTrue(new FollowTrajectory(chassis, false));
-    driverController.leftButton().onTrue(new FollowTrajectory(chassis, true));
-    // driverController.upButton().onTrue(new InstantCommand(()-> arm.setState(ARM_ANGLE_STATES.STARTING)).ignoringDisable(true));
-    
-    driverController.leftBumper().onTrue(new InstantCommand(()-> {
-      chassis.stop();
-      // arm.stop();
-      // gripper.stop();
-      // climb.stopClimb();
-    }, chassis
-    // arm, gripper, climb
-    ).ignoringDisable(true));
-    // driverController.rightBumper().onTrue(new GrabOrDrop(gripper));
-    
-    // driverController.povUp().onTrue(new InstantCommand(()-> arm.setState(ARM_ANGLE_STATES.L3)).ignoringDisable(true));
-    driverController.povRight().onTrue(new InstantCommand(()-> currentFeederSide = FEEDER_SIDE.FAR));
-    // driverController.povDown().onTrue(new InstantCommand(()-> arm.setState(ARM_ANGLE_STATES.L2)).ignoringDisable(true));
-    driverController.povLeft().onTrue(new InstantCommand(()-> currentFeederSide = FEEDER_SIDE.CLOSE));
-
-    // driverController.rightSetting().onTrue(new InstantCommand(()-> arm.setState(ARM_ANGLE_STATES.CORAL_STATION)).ignoringDisable(true));
-    driverController.leftSettings().onTrue(new ChangeReefToClosest(chassis));
-
-    // operatorController.leftStick().onTrue(new ArmDrive(arm, operatorController));
-    
-    // SmartDashboard.putData("Open Climb", new OpenClimber(driverController, climb));
-    // operatorController.upButton().onTrue(new OpenClimber(driverController, climb));
-    // operatorController.rightButton().onTrue(new InstantCommand((robot1Strip::setCoralStation)).ignoringDisable(true));
-    // operatorController.downButton().whileTrue(new GripperDrive(gripper, operatorController));
-    // operatorController.leftButton().onTrue(new ArmCalibration(arm));
-    
-    // operatorController.rightBumper().onTrue(new ClimbUntilSensor(climb));
-    // operatorController.leftBumper().onTrue(new InstantCommand(()-> {
-    //   chassis.stop();
-    //   arm.stop();
-    //   gripper.stop();
-    //   arm.setState(ARM_ANGLE_STATES.IDLE);
-    //   climb.stopClimb();
-    // }, chassis, arm, gripper, climb).ignoringDisable(true));
-
-    // operatorController.povUp().onTrue(new InstantCommand(climb::stopClimb ,climb).ignoringDisable(true));
-    // operatorController.povRight().onTrue(new InstantCommand(gripper::stop, gripper).ignoringDisable(true));
-    // operatorController.povDown().onTrue(new InstantCommand(chassis::stop, chassis).ignoringDisable(true));
-    // operatorController.povLeft().onTrue(new InstantCommand(()-> {arm.stop(); arm.setState(ARM_ANGLE_STATES.IDLE);}, arm).ignoringDisable(true));
-
-    // operatorController.rightBumper().onTrue(new InstantCommand(()-> arm.hadCalibrated()).ignoringDisable(true));
-    
-    // operatorController.rightSetting().onTrue(new InstantCommand(robot1Strip::setManualOrAuto).ignoringDisable(true));
-    // operatorController.leftSettings().onTrue(new InstantCommand(()-> chassis.setYaw(Rotation2d.kPi)).ignoringDisable(true));
+    driverController.downButton().onTrue(new GoToPose());
+  
   }
 
   private void configureAuto() {
