@@ -4,15 +4,15 @@
 
 package frc.robot.vision.subsystem;
 
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
+
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
+import static frc.robot.vision.utils.VisionConstants.OFFSET_ROBOT_TO_QUEST;
+
 
 public class Quest extends SubsystemBase {
   QuestNav questNav;
@@ -25,13 +25,15 @@ public class Quest extends SubsystemBase {
     PoseFrame[] poseFrames = questNav.getAllUnreadPoseFrames();
     if (poseFrames.length > 0) {
       // Get the most recent Quest pose
-      questPose = poseFrames[poseFrames.length - 1].questPose();
+      questPose = poseFrames[poseFrames.length - 1].questPose().plus(OFFSET_ROBOT_TO_QUEST);
   }
     return questPose;
   }
 
   @Override
   public void periodic() {
+    questNav.commandPeriodic();//Cleans up QuestNav responses after processing on the headset
+    // and if we don't have data or for some reason the response we got isn't for the command we sent, skip for this loop
     super.periodic();
     // This method will be called once per scheduler run
 
