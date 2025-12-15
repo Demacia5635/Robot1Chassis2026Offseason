@@ -150,8 +150,8 @@ public class VisionConstants {
         public static final double PREDICT_OMEGA = 0.2;
 
 
-        public static final double OFFSET_QUEST_X =0.3;//TODO: need to find the right offset
-        public static final double OFFSET_QUEST_Y = 0.3;//TODO: need to find the right offset
+        public static final double OFFSET_QUEST_X = 0.35;//TODO: need to find the right offset
+        public static final double OFFSET_QUEST_Y = 0;//TODO: need to find the right offset
         public static final Rotation2d OFFSET_QUEST_ANGLE = Rotation2d.fromDegrees(90);
         public static final Transform2d OFFSET_ROBOT_TO_QUEST = new Transform2d(OFFSET_QUEST_X,OFFSET_QUEST_Y,OFFSET_QUEST_ANGLE);
 }

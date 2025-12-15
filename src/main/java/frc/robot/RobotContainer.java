@@ -100,6 +100,10 @@ public class RobotContainer implements Sendable{
   private Trigger userButtonTrigger;
   public static Quest quest;
 
+
+  public static int N_CYCLE = 0;
+  public static double CYCLE_TIME = 0.02;
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     quest = new Quest();
@@ -107,7 +111,7 @@ public class RobotContainer implements Sendable{
     robotContainer = this;
     new LogManager();
     ledManager = new LedManager();
-    driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kPS5);
+    driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kXbox);
     // operatorController = new CommandController(OperatorConstants.OPERATOR_CONTROLLER_PORT, ControllerType.kXbox);
     // allianceTrigger = new Trigger(() -> isRed);
 
