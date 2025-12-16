@@ -1,61 +1,74 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.vision.subsystem;
 
 
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.demacia.utils.Log.LogManager;
-import frc.demacia.utils.Log.LogEntryBuilder;
-import frc.demacia.utils.Log.LogEntryBuilder.LogLevel;
 import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
+import static frc.robot.vision.utils.VisionConstants.*;
 
-import static frc.robot.vision.utils.VisionConstants.OFFSET_QUEST_X;
-import static frc.robot.vision.utils.VisionConstants.OFFSET_QUEST_Y;
-import static frc.robot.vision.utils.VisionConstants.OFFSET_ROBOT_TO_QUEST;
 
 
 public class Quest extends SubsystemBase {
-  QuestNav questNav;
-  /** Creates a new Quest. */
-  @SuppressWarnings("unchecked")
+  private Field2d field;
+  private QuestNav questNav;
+  private Pose2d currentPose;
+  private PoseFrame[] poseFrames;
+
   public Quest() {
     questNav = new QuestNav();
-    LogManager.addEntry("q values x", () -> questPose2d().getX())
-      .withLogLevel(LogLevel.LOG_AND_NT_NOT_IN_COMP).build();
+    poseFrames = questNav.getAllUnreadPoseFrames();
+
+if (poseFrames.length > 0) {
+    // Get the most recent Quest pose
+    currentPose = poseFrames[poseFrames.length - 1].questPose().plus(OFFSET_ROBOT_TO_QUEST);
+}
+    field = new Field2d();
+    if(currentPose != null){
+      field.setRobotPose(currentPose);
+      questNav.setPose(currentPose);
       
-    LogManager.addEntry("q values y", () -> questPose2d().getY())
-    .withLogLevel(LogLevel.LOG_AND_NT_NOT_IN_COMP).build();
+    }
+    SmartDashboard.putData("Quest Field", field);
+
+    
+
   }
-  public Pose2d questPose2d(){
-    Pose2d questPose = new Pose2d();
-    PoseFrame[] poseFrames = questNav.getAllUnreadPoseFrames();
-    if (poseFrames.length > 0) {
-      // Get the most recent Quest pose
-      questPose = poseFrames[poseFrames.length - 1].questPose().plus(OFFSET_ROBOT_TO_QUEST);
+
+  public Pose2d getPose() {
+    return currentPose;
   }
-    return questPose;
+  public void questReset(){
+    questNav.setPose(new Pose2d(0,0, new Rotation2d()).plus(OFFSET_ROBOT_TO_QUEST));
   }
+  
 
   @Override
   public void periodic() {
-    questNav.commandPeriodic();//Cleans up QuestNav responses after processing on the headset
-    // and if we don't have data or for some reason the response we got isn't for the command we sent, skip for this loop
+    questNav.commandPeriodic();
+      
+      // Connection status
+    poseFrames = questNav.getAllUnreadPoseFrames();
 
-    // This method will be called once per scheduler run
+      if (poseFrames.length > 0) {
+        // Get the most recent Quest pose
+        currentPose = poseFrames[poseFrames.length - 1].questPose().plus(OFFSET_ROBOT_TO_QUEST);
+    }
+      
+      // Position data
+      
+    if(currentPose != null){
+      SmartDashboard.putNumber("Quest X", currentPose.getX());
+      SmartDashboard.putNumber("Quest Y", currentPose.getY());
+      
+      field.setRobotPose(currentPose);
+    }
 
 
-  }
-  @Override
-  public void initSendable(SendableBuilder builder){
-    super.initSendable(builder);
-    builder.addDoubleProperty("dvirs values of Quest x",() -> questPose2d().getX(), null);
-    builder.addDoubleProperty("dvirs values of Quest y",() -> questPose2d().getY(), null);
   }
 }
-

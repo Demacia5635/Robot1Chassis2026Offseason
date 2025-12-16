@@ -13,7 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
 import frc.robot.chassis.subsystems.Chassis;
-import frc.robot.vision.Quest;
+import frc.robot.vision.subsystem.Quest;
 
 public class GoToPose extends Command {
   double dKp = 0.9;

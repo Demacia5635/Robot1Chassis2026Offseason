@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.demacia.utils.Log.LogEntryBuilder.LogLevel;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.Path.Trajectory.ChangeReefToClosest;
 import frc.robot.Path.Trajectory.FollowTrajectory;
@@ -59,7 +60,8 @@ import frc.robot.utils.LogManager;
 import frc.robot.utils.CommandController.ControllerType;
 import frc.robot.utils.Elastic.Notification;
 import frc.robot.utils.Elastic.Notification.NotificationLevel;
-import frc.robot.vision.Quest;
+import frc.robot.vision.subsystem.Quest;
+
 
 
 /**
@@ -111,10 +113,11 @@ public class RobotContainer implements Sendable{
     robotContainer = this;
     new LogManager();
     ledManager = new LedManager();
-    quest = new Quest();
+
     driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kXbox);
     // operatorController = new CommandController(OperatorConstants.OPERATOR_CONTROLLER_PORT, ControllerType.kXbox);
     // allianceTrigger = new Trigger(() -> isRed);
+
 
     SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
     SmartDashboard.putData("RC", this);
@@ -126,6 +129,10 @@ public class RobotContainer implements Sendable{
     Elastic.sendNotification(new Notification(NotificationLevel.INFO, "Start Robot Code", ""));
     
     configureSubsytems();
+    SmartDashboard.putData("reset quest pos",new InstantCommand(()-> quest.questReset()).ignoringDisable(true));
+    
+      
+
     new AutoUtils();
     configureDefaultCommands();
     configureBindings();
@@ -157,6 +164,10 @@ public class RobotContainer implements Sendable{
     // povCam.setFPS(30);
 
     chassis = new Chassis();
+    quest = new Quest();
+
+    // LogManager.addEntry("q values x", () -> quest.getX());
+    // LogManager.addEntry("q values Y", () -> quest.getY());
     // arm = new Arm();
     // gripper = new Gripper();
     // climb = new Climb();
@@ -179,6 +190,7 @@ public class RobotContainer implements Sendable{
 
     driverController.getLeftStickMove().onTrue(new Drive(chassis, driverController));
     driverController.downButton().onTrue(new GoToPose());
+    driverController.upButton().onTrue(new InstantCommand(()-> quest.questReset()).ignoringDisable(true));
   
   }
 
@@ -223,6 +235,7 @@ public class RobotContainer implements Sendable{
   public void initSendable(SendableBuilder builder) {
     builder.addBooleanProperty("isRed", RobotContainer::isRed, RobotContainer::setIsRed);
     builder.addBooleanProperty("isComp", RobotContainer::isComp, RobotContainer::setIsComp);
+    
   }
 
   /**
