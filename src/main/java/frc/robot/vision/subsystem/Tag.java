@@ -86,6 +86,9 @@ public class Tag extends SubsystemBase {
     // SmartDashboard.putData("Tag" + cameraId, this);
     // SmartDashboard.putData("field-tag" + camera.getName(), field);
   }
+  public Camera getCamera(){
+    return camera;
+  }
 
   @Override
   public void periodic() {

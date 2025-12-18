@@ -60,6 +60,7 @@ import frc.robot.utils.CommandController.ControllerType;
 import frc.robot.utils.Elastic.Notification;
 import frc.robot.utils.Elastic.Notification.NotificationLevel;
 import frc.robot.vision.Quest;
+import frc.robot.vision.subsystem.ObjectPose;
 
 
 /**
@@ -70,6 +71,7 @@ import frc.robot.vision.Quest;
  */
 public class RobotContainer implements Sendable{
 
+  public static ObjectPose objectPose;
   public static RobotContainer robotContainer;
   public static LedManager ledManager;
   public static CommandController driverController;
@@ -92,6 +94,7 @@ public class RobotContainer implements Sendable{
   public enum AutoMode {
     LEFT, MIDDLE, RIGHT
   }
+
   public static Command leftAuto;
   public static Command middleAuto;
   public static Command rightAuto;
@@ -111,6 +114,7 @@ public class RobotContainer implements Sendable{
     robotContainer = this;
     new LogManager();
     ledManager = new LedManager();
+
     driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kXbox);
     // operatorController = new CommandController(OperatorConstants.OPERATOR_CONTROLLER_PORT, ControllerType.kXbox);
     // allianceTrigger = new Trigger(() -> isRed);
@@ -156,6 +160,7 @@ public class RobotContainer implements Sendable{
     // povCam.setFPS(30);
 
     chassis = new Chassis();
+    objectPose = new ObjectPose(chassis.getTag("reefRight").getCamera(),()-> chassis.getGyroAngle(),()-> chassis.getPoseVisionEstimation());
     // arm = new Arm();
     // gripper = new Gripper();
     // climb = new Climb();

@@ -66,6 +66,8 @@ public class Chassis extends SubsystemBase {
     private Rotation2d lastGyroYaw;
 
     public Chassis() {
+
+
         modules = new SwerveModule[] {
                 new SwerveModule(FRONT_LEFT),
                 new SwerveModule(FRONT_RIGHT),
@@ -100,7 +102,8 @@ public class Chassis extends SubsystemBase {
 
         barge = new Tag(()->getGyroAngle(), ()->getChassisSpeedsRobotRel(), 
             new Camera("barge", new Translation3d(0.13, 0.284, 0.89), 53, 180, CameraType.BARGE));
-            
+
+
         visionFuse = new VisionFuse(reefRight, feeder, barge, reefLeft);
 
 
@@ -137,6 +140,24 @@ public class Chassis extends SubsystemBase {
         // SmartDashboard.putData(getName() + "/Swerve Drive", getChassisWidget());
         // SmartDashboard.putData("Chassis", this);
     }
+    public Tag getTag(String tagName){
+
+        switch (tagName) {
+            case "reefRight":
+                return reefRight;
+            case "reefLeft":
+                return reefLeft;
+            case "feeder":
+                return feeder;
+            case "barge":
+                return barge;
+
+            default:
+                break;
+        }
+        return barge;
+    }
+
 
     public void checkElectronics() {
         for (SwerveModule module : modules) {
@@ -368,6 +389,10 @@ public class Chassis extends SubsystemBase {
     Pose2d visionFusePoseEstimation;
     Rotation2d gyroAngle;
 
+    public Pose2d getPoseVisionEstimation(){
+        return getPoseVisionEstimation();
+    }
+    
     @Override
     public void periodic() {
         visionFusePoseEstimation = visionFuse.getPoseEstemation();
