@@ -40,8 +40,8 @@ public class Drive extends Command {
     public void execute() {
         isRed = chassis.isRed();
         direction = isRed ? 1 : -1;
-        double joyX = controller.getLeftX() * direction;
-        double joyY = controller.getLeftY() * direction;
+        double joyX = controller.getLeftY() * direction;
+        double joyY = controller.getLeftX() * direction;
         
         // Calculate r]otation from trigger axes
         double rot = controller.getLeftTrigger() - controller.getRightTrigger();

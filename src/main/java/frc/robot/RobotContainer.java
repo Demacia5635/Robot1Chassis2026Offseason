@@ -114,7 +114,7 @@ public class RobotContainer implements Sendable{
     new LogManager();
     ledManager = new LedManager();
 
-    driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kXbox);
+    driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kPS5);
     // operatorController = new CommandController(OperatorConstants.OPERATOR_CONTROLLER_PORT, ControllerType.kXbox);
     // allianceTrigger = new Trigger(() -> isRed);
 

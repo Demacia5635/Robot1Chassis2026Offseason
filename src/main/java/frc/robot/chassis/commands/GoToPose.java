@@ -37,6 +37,7 @@ public class GoToPose extends Command {
 
     Translation2d diffVector = quest.getPose().getTranslation();
     ChassisSpeeds speeds = new ChassisSpeeds(diffVector.getY() * dKp, -diffVector.getX() * dKp, 0);
+    if(Math.abs(chassis.getPose().getRotation().getDegrees()) <= 2) speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, 0);
     chassis.setVelocities(speeds);
   }
 
