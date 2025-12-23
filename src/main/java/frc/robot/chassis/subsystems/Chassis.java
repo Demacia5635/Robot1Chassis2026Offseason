@@ -196,6 +196,10 @@ public class Chassis extends SubsystemBase {
         setVelocities(limitedVelocities);
 
     }
+    
+    public double getOmegaVelocity(){
+        return getChassisSpeedsFieldRel().omegaRadiansPerSecond;
+    }
 
     public void setVelocities(ChassisSpeeds speeds) {
         speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getGyroAngle());
