@@ -14,14 +14,14 @@ import frc.robot.vision.subsystem.Tag;
 /** Add your docs here. */
 public class VisionFuse {
 
-    private Tag[] tags = new Tag[4];
+    private Tag[] tags = new Tag[3];
 
     public VisionFuse(Tag right, Tag feeder, Tag barge, Tag left) {
 
-        this.tags[0] = right;
-        this.tags[1] = feeder;
-        this.tags[2] = barge;
-        this.tags[3] = left;
+        // this.tags[0] = right;
+        this.tags[0] = feeder;
+        this.tags[1] = barge;
+        this.tags[2] = left;
 
     }
 

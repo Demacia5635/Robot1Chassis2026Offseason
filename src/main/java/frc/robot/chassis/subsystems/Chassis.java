@@ -387,10 +387,22 @@ public class Chassis extends SubsystemBase {
 
 
     Pose2d visionFusePoseEstimation;
+    Pose2d tempPose2d;
     Rotation2d gyroAngle;
 
     public Pose2d getPoseVisionEstimation(){
-        return getPoseVisionEstimation();
+       if(visionFusePoseEstimation == null){
+        if(tempPose2d == null){
+            return Pose2d.kZero;
+        }
+        else{
+            return tempPose2d;
+        }
+       }
+       else{
+        tempPose2d = visionFusePoseEstimation;
+        return visionFusePoseEstimation;
+       }
     }
     
     @Override

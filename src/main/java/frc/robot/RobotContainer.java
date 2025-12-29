@@ -6,6 +6,7 @@ package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.util.sendable.Sendable;
@@ -109,13 +110,13 @@ public class RobotContainer implements Sendable{
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    quest = new Quest();
+    // quest = new Quest();
     // WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     robotContainer = this;
     new LogManager();
     ledManager = new LedManager();
 
-    driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kXbox);
+    driverController = new CommandController(OperatorConstants.DRIVER_CONTROLLER_PORT, ControllerType.kPS5);
     // operatorController = new CommandController(OperatorConstants.OPERATOR_CONTROLLER_PORT, ControllerType.kXbox);
     // allianceTrigger = new Trigger(() -> isRed);
 
@@ -160,8 +161,10 @@ public class RobotContainer implements Sendable{
     // povCam.setFPS(30);
 
     chassis = new Chassis();
-    objectPose = new ObjectPose(chassis.getTag("reefRight").getCamera(),()-> chassis.getGyroAngle(),()-> chassis.getPoseVisionEstimation());
+    // objectPose = new ObjectPose(chassis.getTag("reefRight").getCamera(),()-> chassis.getGyroAngle(),()-> chassis.getPoseVisionEstimation());
+    objectPose = new ObjectPose(chassis.getTag("reefRight").getCamera(),()-> chassis.getGyroAngle(),()-> Pose2d.kZero);
     // arm = new Arm();
+
     // gripper = new Gripper();
     // climb = new Climb();
     // robot1Strip = new Robot1Strip(chassis, arm, gripper);
