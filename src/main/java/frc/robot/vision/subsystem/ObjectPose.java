@@ -67,13 +67,11 @@ public class ObjectPose extends SubsystemBase {
   @Override
   public void periodic() {
     camToObjectPitch = Table.getEntry("ty").getDouble(0.0)+ camera.getPitch();
-    camToObjectYaw = (-Table.getEntry("tx").getDouble(0.0)) - camera.getYaw();
+    camToObjectYaw = (-Table.getEntry("tx").getDouble(0.0)) + camera.getYaw();
     if(Table.getEntry("tv").getDouble(0.0) != 0){
       objectPose = new Pose2d(getOriginToObject(), getRobotAngle.get());
       field.setRobotPose(objectPose);
       // robotfield.setRobotPose(robotCurrentPose.get());
-
-
     }
     
   }
@@ -97,9 +95,9 @@ public class ObjectPose extends SubsystemBase {
   public double getDistcameraToObject(){
     double alpha = camToObjectPitch;
     alpha = Math.toRadians(alpha);
-    double distX =  camera.getHeight()/(Math.tan(alpha));
-    double distFinal = distX /Math.cos(Math.toRadians( Math.abs( camToObjectYaw)));
-    return distFinal;
+    double distX =  camera.getHeight()*(Math.tan(alpha));
+    double distFinal = distX /Math.cos(Math.toRadians(camToObjectYaw));
+    return Math.abs(distFinal);
   }
 
    /**
@@ -108,7 +106,7 @@ public class ObjectPose extends SubsystemBase {
    * @return Translation2d from robot center to object in robot coordinates
    */
   public Translation2d getRobotToObject(){
-    cameraToObject = new Translation2d(getDistcameraToObject(),camToObjectYaw);
+    cameraToObject = new Translation2d(getDistcameraToObject(),Rotation2d.fromDegrees(camToObjectYaw));
     robotToObject = new Translation2d(camera.getRobotToCamPosition().getX(), camera.getRobotToCamPosition().getY()).plus(cameraToObject);
     return robotToObject;
   }
