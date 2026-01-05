@@ -35,8 +35,8 @@ public class GoToPose extends Command {
   @Override
   public void execute() {
 
-    Translation2d diffVector = quest.getPose().getTranslation();
-    ChassisSpeeds speeds = new ChassisSpeeds(diffVector.getY() * dKp, -diffVector.getX() * dKp, 0);
+    Translation2d diffVector = quest.getRobotPose().getTranslation();
+    ChassisSpeeds speeds = new ChassisSpeeds(diffVector.getY() * dKp, diffVector.getX() * dKp, 0);
     if(Math.abs(chassis.getPose().getRotation().getDegrees()) <= 2) speeds = new ChassisSpeeds(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, 0);
     chassis.setVelocities(speeds);
   }
@@ -50,6 +50,6 @@ public class GoToPose extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Math.abs(quest.getPose().getTranslation().getX()) < 0.01 && Math.abs(quest.getPose().getTranslation().getY()) < 0.01;
+    return Math.abs(quest.getRobotPose().getTranslation().getX()) < 0.01 && Math.abs(quest.getRobotPose().getTranslation().getY()) < 0.01;
   }
 }

@@ -1,4 +1,3 @@
-
 package frc.robot.vision.subsystem;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,64 +13,79 @@ import static frc.robot.vision.utils.VisionConstants.*;
 public class Quest extends SubsystemBase {
   private Field2d field;
   private QuestNav questNav;
-  private Pose2d currentPose;
-  private PoseFrame[] poseFrames;
+  private Pose3d currentQuestPose;
+  private boolean isCalibrated;
+  private double timestamp;
 
   public Quest() {
+    isCalibrated = false;
+    timestamp = 0;
     questNav = new QuestNav();
-    poseFrames = questNav.getAllUnreadPoseFrames();
-
-    if (poseFrames.length > 0) {
-      // Get the most recent Quest pose
-      currentPose = poseFrames[poseFrames.length - 1].questPose3d().toPose2d();
-    }
     field = new Field2d();
-    if (currentPose != null) {
-      field.setRobotPose(currentPose);
-      questNav.setPose(new Pose3d(currentPose));
-
-    }
+    currentQuestPose = new Pose3d(); // Initialize to origin - IMPORTANT!
+    
     SmartDashboard.putData("Quest Field", field);
-
+  }
+  public boolean isCalibrated(){
+    return isCalibrated;
+  }
+  
+  // Set robot pose (transforms to Quest frame and sends to QuestNav)
+  public void setQuestPose(Pose3d currentBotpose){
+    currentQuestPose = currentBotpose.transformBy(ROBOT_TO_QUEST);
+    questNav.setPose(currentQuestPose);
+    isCalibrated = true;// i know it is inefficent
   }
 
-  public Pose2d getPose() {
-    return currentPose;
+  // Get robot pose (transforms from Quest frame to robot frame)
+  public Pose2d getRobotPose() { 
+    return currentQuestPose.transformBy(ROBOT_TO_QUEST.inverse()).toPose2d();
   }
-
-  public void questReset() {
-    questNav.setPose(new Pose3d(new Pose2d(0, 0, new Rotation2d())));
+  
+  // Check if Quest is connected
+  public boolean isConnected() {
+    return questNav.isConnected();
   }
-
-  private Pose2d calculateQuestPose(){
-    poseFrames = questNav.getAllUnreadPoseFrames();
-
-    if (poseFrames.length > 0) {
-      // Get the most recent Quest pose
-      return questCoordsToRobotCoords(poseFrames[poseFrames.length - 1].questPose3d().toPose2d());
-    }
-    return Pose2d.kZero;
-
+  
+  // Check if Quest is tracking
+  public boolean isTracking() {
+    return questNav.isTracking();
   }
+  
 
-  private Pose2d questCoordsToRobotCoords(Pose2d questBasedPose){
-    return new Pose2d(-questBasedPose.getY(), questBasedPose.getX(), Rotation2d.kZero);
-  }
   @Override
   public void periodic() {
     questNav.commandPeriodic();
 
-    // Connection status
-    currentPose = calculateQuestPose();
+    PoseFrame[] poseFrames = questNav.getAllUnreadPoseFrames();
+    
+    if(poseFrames.length > 0 && poseFrames[poseFrames.length - 1].isTracking()){
+      currentQuestPose = poseFrames[poseFrames.length - 1].questPose3d();
+      timestamp = poseFrames[poseFrames.length - 1].dataTimestamp();
+      // Display Quest pose
+      SmartDashboard.putNumber("Quest X", currentQuestPose.getX());
+      SmartDashboard.putNumber("Quest Y", currentQuestPose.getY());
+      SmartDashboard.putNumber("Quest Rotation", currentQuestPose.getRotation().getZ());
 
-    // Position data
-
-    if (currentPose != null) {
-      SmartDashboard.putNumber("Quest X", currentPose.getX());
-      SmartDashboard.putNumber("Quest Y", currentPose.getY());
-
-      field.setRobotPose(currentPose);
+      field.setRobotPose(currentQuestPose.toPose2d());
     }
-
+    
+    // Diagnostics - helpful for debugging!
+    SmartDashboard.putBoolean("Quest Connected", questNav.isConnected());
+    SmartDashboard.putBoolean("Quest Tracking", questNav.isTracking());
+    SmartDashboard.putNumber("Quest Latency (ms)", questNav.getLatency());
+    
+    // Battery monitoring
+    questNav.getBatteryPercent().ifPresent(
+      battery -> SmartDashboard.putNumber("Quest Battery %", battery)
+    );
+  }
+  // gives me the timestamp of the newst frame
+  public double getTimestamp(){
+    return timestamp;
+  }
+  
+  public void questReset() {
+    questNav.setPose(new Pose3d(new Pose2d(0, 0, Rotation2d.kZero)));
   }
 }
