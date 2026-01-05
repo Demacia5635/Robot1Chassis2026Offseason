@@ -15,7 +15,9 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -44,6 +46,7 @@ import frc.robot.utils.LogManager;
 import frc.robot.utils.Utils;
 import frc.robot.vision.Camera;
 import frc.robot.vision.Camera.CameraType;
+import frc.robot.vision.subsystem.Quest;
 import frc.robot.vision.subsystem.Tag;
 import frc.robot.vision.utils.VisionConstants;
 import frc.robot.vision.utils.VisionFuse;
@@ -60,12 +63,15 @@ public class Chassis extends SubsystemBase {
     public Tag barge;
     public Tag reefLeft;
 
+    public Quest quest;
+
     public VisionFuse visionFuse;
 
     private StatusSignal<Angle> gyroYawStatus;
     private Rotation2d lastGyroYaw;
 
     public Chassis() {
+        quest = new Quest();
         modules = new SwerveModule[] {
                 new SwerveModule(FRONT_LEFT),
                 new SwerveModule(FRONT_RIGHT),
@@ -323,6 +329,18 @@ public class Chassis extends SubsystemBase {
         poseEstimator.setVisionMeasurementStdDevs(getSTD());
         poseEstimator.addVisionMeasurement(pose, Timer.getFPGATimestamp() - 0.05);
     }
+    private void updateQuest(Pose2d pose){
+        poseEstimator.setVisionMeasurementStdDevs(getSTDQuest());
+        poseEstimator.addVisionMeasurement(pose, quest.getTimestamp());
+        
+    }
+    private Matrix<N3,N1> getSTDQuest(){
+        double x =0.005; 
+        double y =0.005; 
+        double theta =0.035; 
+
+        return new Matrix<N3, N1>(new SimpleMatrix(new double[] { x, y, theta }));
+    }
 
     private Matrix<N3, N1> getSTD() {
         double x = 0.05;
@@ -365,12 +383,14 @@ public class Chassis extends SubsystemBase {
     }
 
 
+    Pose2d questPoseEstimation;
     Pose2d visionFusePoseEstimation;
     Rotation2d gyroAngle;
 
     @Override
     public void periodic() {
         visionFusePoseEstimation = visionFuse.getPoseEstemation();
+        questPoseEstimation = quest.getRobotPose();
         gyroAngle = getGyroAngle();
         if (visionFusePoseEstimation != null) {
             updateVision(new Pose2d(visionFusePoseEstimation.getTranslation(), gyroAngle));
@@ -378,6 +398,12 @@ public class Chassis extends SubsystemBase {
             // if (visionFuse.get2dAngle() != null){
             //     fieldTest.setRobotPose(new Pose2d(visionFusePoseEstimation.getTranslation(), visionFuse.get2dAngle()));
             // }
+        }
+        else if(quest.isCalibrated() && questPoseEstimation != null){
+            updateQuest(questPoseEstimation);
+        }
+        else if(visionFusePoseEstimation != null){
+            quest.setQuestPose(new Pose3d(new Pose2d(visionFusePoseEstimation.getTranslation(), gyroAngle)));
         }
         poseEstimator.update(gyroAngle, getModulePositions());
 
