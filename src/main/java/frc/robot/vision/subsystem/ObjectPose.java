@@ -114,7 +114,7 @@ public class ObjectPose extends SubsystemBase {
   /**
    * Calculates the translation vector from the field origin to the detected object.
    * Rotates the robot-to-object vector by the robot's field angle, then adds the robot's field position.
-   * @return Translation2d from field origin to object in field coordinates
+   * @return Translation2d from field origin to object in field coordinates 0.775
    */
   public Translation2d getOriginToObject(){
     if(robotCurrentPose.get() != null){
@@ -133,8 +133,8 @@ public class ObjectPose extends SubsystemBase {
    */
   @Override
   public void initSendable(SendableBuilder builder) {
-      builder.addDoubleProperty("X", this::getX, null);
-      builder.addDoubleProperty("Y", this::getY, null);
+      builder.addDoubleProperty("object pos X:", this::getX, null);
+      builder.addDoubleProperty("object pos Y:", this::getY, null);
   }
 
   
